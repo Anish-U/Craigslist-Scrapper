@@ -1,6 +1,7 @@
 require("dotenv").config();
 const request = require("request-promise");
 const cheerio = require("cheerio");
+const ObjectsToCsv = require("objects-to-csv");
 
 const url = process.env.FETCH_URL;
 
@@ -82,10 +83,18 @@ async function scrapeDescription(jobsWithHeaders) {
   );
 }
 
+async function createCSV(jobsWithFullData) {
+  const csv = new ObjectsToCsv(jobsWithFullData);
+  await csv.toDisk(process.env.OUTPUT_FILE_NAME);
+
+  console.log("CSV Created");
+}
+
 async function scrapeCraigslist() {
   const jobsWithHeaders = await scrapeJobHeader();
   const jobsWithFullData = await scrapeDescription(jobsWithHeaders);
   console.log(jobsWithFullData);
+  await createCSV(jobsWithFullData);
 }
 
 scrapeCraigslist();
